@@ -61,12 +61,15 @@ pytest --cov=. --cov-report=term-missing -m ""   # with coverage
 
 ```
 tests/
-  unit/          pure functions/classes in isolation (config, dataset generator,
-                  model shapes, losses, metrics, device selection, checkpoint I/O, logging)
-  integration/    multiple components wired together (dataset -> loader -> model -> loss,
-                  build_dataloaders/run_validation, sliding-window inference, checkpoint
-                  save/load roundtrip, the export_synthetic_samples CLI script)
-  e2e/            a real (tiny) train() run end to end, and train -> checkpoint -> inference
+  unit/             pure functions/classes in isolation (config, dataset generator,
+                     model shapes, losses, metrics, device selection, checkpoint I/O, logging)
+  integration/       multiple components wired together (dataset -> loader -> model -> loss,
+                     build_dataloaders/run_validation, sliding-window inference, checkpoint
+                     save/load roundtrip, the export_synthetic_samples CLI script)
+  e2e/               a real (tiny) train() run end to end, and train -> checkpoint -> inference
+  smoke/             a few real training steps with no file I/O -- catches crashes/NaNs fast
+  overfit/           trains on a fixed tiny batch -- catches a model that runs but never learns
+  data_invariants/   dataset/augmentation output range/shape/dtype checks, no model involved
 ```
 
 All tests run on CPU regardless of local hardware (`tiny_cfg` fixture in
@@ -75,6 +78,35 @@ All tests run on CPU regardless of local hardware (`tiny_cfg` fixture in
 without a GPU. An autouse fixture snapshots/restores `torch`/`random` RNG
 state around every test, since `train()` and `JointAugment` both mutate
 global RNG state.
+
+### Pre-commit gate
+
+Regular tests verify the code *runs*; they don't catch a model that trains
+cleanly but never actually learns (a frozen layer, a loss wired to the wrong
+tensor, gradients not flowing). The `smoke`/`overfit`/`data_invariant` tiers
+above exist specifically for that, and are wired into a git pre-commit hook
+alongside lint/type checks so they run automatically on every commit:
+
+```bash
+pip install -e ".[dev]"   # ruff, mypy, pre-commit, on top of the test deps
+pre-commit install         # one-time: registers the git hook
+```
+
+After that, `git commit` runs, in order: `ruff check .` → `mypy` →
+`pytest tests/smoke` (~5s) → `pytest tests/overfit` (~30s) →
+`pytest tests/data_invariants` (~2s) — and blocks the commit if any stage
+fails. Run the whole gate on demand without committing:
+
+```bash
+pre-commit run --all-files
+```
+
+`smoke` and `data_invariant` are cheap enough to also run as part of plain
+`pytest` (they're not excluded by `addopts`); `overfit` stays opt-in
+(`pytest -m overfit`) alongside `slow`, since letting it into the everyday
+default run would make routine `pytest` calls ~10x slower for a check that's
+really a pre-commit-gate concern, not a "type `pytest` and wait a second"
+one.
 
 ## Design choices worth being able to explain in an interview
 

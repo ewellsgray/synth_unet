@@ -3,6 +3,14 @@ __pycache__/
 *.py[cod]
 .venv/
 venv/
+*.egg-info/
+build/
+dist/
+
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/
 
 # Project artifacts
 checkpoints/

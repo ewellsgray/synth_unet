@@ -1,0 +1,21 @@
+[project]
+name = "synth-unet"
+version = "0.1.0"
+description = "Synthetic-data U-Net trainer for 7-class tissue segmentation"
+requires-python = ">=3.10"
+
+[project.optional-dependencies]
+test = ["pytest>=8.0", "pytest-cov>=5.0"]
+
+[tool.setuptools]
+py-modules = ["config", "train", "inference"]
+
+[tool.setuptools.packages.find]
+include = ["data*", "model*", "utils*", "scripts*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "slow: full training/e2e runs, excluded by default (run with `pytest -m slow`)",
+]
+addopts = "-m 'not slow' -ra"

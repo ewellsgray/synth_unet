@@ -49,6 +49,33 @@ Training auto-detects hardware: NVIDIA GPU (CUDA) -> Intel GPU (XPU, if
 CPU, reduce `synthetic_train_size`/`epochs`/`patch_size` in `config.py` for a
 quick smoke test — the full config is sized for actual GPU hardware.
 
+## Testing
+
+```bash
+pip install -e ".[test]"   # installs pytest/pytest-cov on top of requirements.txt
+pytest                      # unit + integration tests (fast, CPU, seconds)
+pytest -m slow              # end-to-end tests: real tiny train() runs + checkpoint/inference
+pytest -m ""                 # everything, including slow
+pytest --cov=. --cov-report=term-missing -m ""   # with coverage
+```
+
+```
+tests/
+  unit/          pure functions/classes in isolation (config, dataset generator,
+                  model shapes, losses, metrics, device selection, checkpoint I/O, logging)
+  integration/    multiple components wired together (dataset -> loader -> model -> loss,
+                  build_dataloaders/run_validation, sliding-window inference, checkpoint
+                  save/load roundtrip, the export_synthetic_samples CLI script)
+  e2e/            a real (tiny) train() run end to end, and train -> checkpoint -> inference
+```
+
+All tests run on CPU regardless of local hardware (`tiny_cfg` fixture in
+`tests/conftest.py` forces `device_preference=["cpu"]` and shrinks
+`patch_size`/dataset sizes/epochs) so they're fast and reproducible in CI
+without a GPU. An autouse fixture snapshots/restores `torch`/`random` RNG
+state around every test, since `train()` and `JointAugment` both mutate
+global RNG state.
+
 ## Design choices worth being able to explain in an interview
 
 - **Mixed precision (AMP)** is on by default (`config.use_amp`) — real

@@ -130,3 +130,21 @@ one.
   saved automatically — a direct answer to "how do we get this out of a
   notebook" (reproducible runs, resumable training, a real artifact to
   deploy rather than an in-memory model object).
+
+## Known issues / future work
+
+- **Test fixture duplication**: `tests/smoke/`, `tests/overfit/`, and
+  `tests/data_invariants/` each build their own tiny dataset/model inline
+  (`patch_size=32`, small `base_features`/`depth`) instead of sharing a
+  fixture, since they intentionally skip `TrainConfig`/file I/O to stay fast.
+  Consider factoring a shared `tiny_model_and_data` fixture in
+  `tests/conftest.py` (see the comment above `tiny_cfg` there) if these three
+  files' parameters drift out of sync.
+- **`torch.cuda.amp.GradScaler` deprecation**: `train.py`'s `GradScaler`
+  construction raises a `FutureWarning` on current torch (visible in the
+  `tests/e2e` output) — should move to `torch.amp.GradScaler('cuda', ...)`.
+- **`ruff`'s `BLE001`/`S110` are ignored project-wide** (in `pyproject.toml`)
+  to allow the intentional broad `except Exception: pass` in
+  `utils/device.py`/`utils/logging.py`'s optional-XPU-backend probing. If
+  broad excepts show up elsewhere later, this ignore won't catch it —
+  consider switching to per-line `# noqa` on just those blocks instead.

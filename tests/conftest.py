@@ -19,6 +19,12 @@ def rng_isolation():
     random.setstate(random_state)
 
 
+# FUTURE WORK: tests/smoke, tests/overfit, and tests/data_invariants each
+# build their own tiny dataset/model inline (patch_size=32, small
+# base_features/depth) instead of using this fixture, since they intentionally
+# skip TrainConfig/file I/O to stay fast. That leaves the "tiny" parameters
+# duplicated across three files -- consider factoring a shared
+# `tiny_model_and_data` fixture here if they drift out of sync.
 @pytest.fixture
 def tiny_cfg(tmp_path):
     """A TrainConfig sized for fast, deterministic CPU test runs."""

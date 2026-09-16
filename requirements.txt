@@ -1,0 +1,10 @@
+torch>=2.1
+numpy>=1.24
+scipy>=1.10          # optional: smoother synthetic texture; falls back gracefully if missing
+Pillow>=10.0          # PNG export for synthetic sample inspection (scripts/export_synthetic_samples.py)
+
+# Not required to run this project, but listed here as the realistic next
+# step for a real data pipeline (see data/real_dataset.py):
+# tifffile>=2023.0    # reading/writing OME-TIFF mosaics
+# zarr>=2.16          # reading/writing OME-Zarr volumetric data
+# intel_extension_for_pytorch  # only if targeting an Intel GPU (XPU) backend

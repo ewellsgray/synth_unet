@@ -6,7 +6,6 @@ in lockstep with its image (no interpolation on the mask - it's categorical
 labels, not continuous pixel values).
 """
 import random
-from typing import Tuple
 
 import torch
 
@@ -25,7 +24,7 @@ class JointAugment:
 
     def __call__(
         self, image: torch.Tensor, mask: torch.Tensor
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+    ) -> tuple[torch.Tensor, torch.Tensor]:
         # image: (C, H, W) float in [0,1], mask: (H, W) long
 
         if random.random() < self.flip_prob:

@@ -1,7 +1,7 @@
 """Small checkpointing helpers so training can be paused/resumed and the best
 model kept, rather than everything living transiently in a notebook kernel."""
 import os
-from typing import Any, Dict, Optional
+from typing import Any
 
 import torch
 
@@ -12,7 +12,7 @@ def save_checkpoint(
     optimizer: torch.optim.Optimizer,
     epoch: int,
     best_metric: float,
-    extra: Optional[Dict[str, Any]] = None,
+    extra: dict[str, Any] | None = None,
 ) -> None:
     os.makedirs(os.path.dirname(path), exist_ok=True)
     payload = {
@@ -28,9 +28,9 @@ def save_checkpoint(
 def load_checkpoint(
     path: str,
     model: torch.nn.Module,
-    optimizer: Optional[torch.optim.Optimizer] = None,
-    map_location: Optional[str] = None,
-) -> Dict[str, Any]:
+    optimizer: torch.optim.Optimizer | None = None,
+    map_location: str | None = None,
+) -> dict[str, Any]:
     payload = torch.load(path, map_location=map_location)
     model.load_state_dict(payload["model_state"])
     if optimizer is not None and "optimizer_state" in payload:

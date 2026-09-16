@@ -25,25 +25,30 @@ import time
 import torch
 from torch.utils.data import DataLoader
 
-from config import TrainConfig, TISSUE_CLASSES
+from config import TISSUE_CLASSES, TrainConfig
 from data.synthetic_dataset import SyntheticTissueDataset
 from data.transforms import JointAugment
-from model.unet import TissueSegUNet, count_parameters
 from model.losses import WeightedCEDiceLoss, compute_inverse_frequency_weights
-from utils.device import get_device, amp_is_supported
-from utils.metrics import balanced_accuracy, per_class_dice, format_class_metrics
-from utils.checkpoint import save_checkpoint, load_checkpoint
+from model.unet import TissueSegUNet, count_parameters
+from utils.checkpoint import load_checkpoint, save_checkpoint
+from utils.device import amp_is_supported, get_device
 from utils.logging import (
-    setup_run_logger, log_environment, log_config, format_duration,
-    gpu_memory_mb, reset_peak_memory_stats, MetricsRecorder,
+    MetricsRecorder,
+    format_duration,
+    gpu_memory_mb,
+    log_config,
+    log_environment,
+    reset_peak_memory_stats,
+    setup_run_logger,
 )
+from utils.metrics import balanced_accuracy, format_class_metrics, per_class_dice
 
 
 def build_dataloaders(cfg: TrainConfig, augment: JointAugment):
-    train_ds = SyntheticTissueDataset(
+    train_ds: torch.utils.data.Dataset = SyntheticTissueDataset(
         num_samples=cfg.synthetic_train_size, patch_size=cfg.patch_size, seed=cfg.seed
     )
-    val_ds = SyntheticTissueDataset(
+    val_ds: torch.utils.data.Dataset = SyntheticTissueDataset(
         num_samples=cfg.synthetic_val_size, patch_size=cfg.patch_size, seed=cfg.seed + 1
     )
 

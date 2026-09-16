@@ -17,7 +17,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
-from config import TrainConfig, TISSUE_CLASSES
+from config import TISSUE_CLASSES, TrainConfig
 from data.synthetic_dataset import make_synthetic_case
 from model.unet import TissueSegUNet
 from utils.device import get_device
@@ -34,7 +34,7 @@ def sliding_window_inference(
 ) -> torch.Tensor:
     """Returns per-class probability maps of shape (num_classes, H, W)."""
     model.eval()
-    c, h, w = image.shape
+    _c, h, w = image.shape
     stride = max(1, int(patch_size * (1 - overlap)))
 
     prob_sum = torch.zeros(num_classes, h, w)

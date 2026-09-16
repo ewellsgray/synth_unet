@@ -23,7 +23,6 @@ or a vendor SDK).
 """
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Tuple
 
 import torch
 from torch.utils.data import Dataset
@@ -47,8 +46,8 @@ class PatchIndexEntry:
     x: int                    # top-left x of the patch within the mosaic
     y: int                    # top-left y of the patch within the mosaic
     z: int = 0                # z-plane index, for volumetric data (0 for a single 2D plane)
-    model_confidence: float = None  # confidence score from the current model, if this
-                                     # patch came through the confidence-based review queue
+    model_confidence: float | None = None  # confidence score from the current model, if this
+                                            # patch came through the confidence-based review queue
     reviewed_by_pathologist: bool = False
 
 
@@ -74,16 +73,16 @@ class RealTissuePatchDataset(Dataset):
         self.index_path = Path(index_path)
         self.patch_size = patch_size
         self.transform = transform
-        self.entries: List[PatchIndexEntry] = self._load_index()
+        self.entries: list[PatchIndexEntry] = self._load_index()
 
-    def _load_index(self) -> List[PatchIndexEntry]:
+    def _load_index(self) -> list[PatchIndexEntry]:
         raise NotImplementedError(
             "Point this at the real patch index (SQLite/Parquet/CSV) once it exists. "
             "This stub intentionally has no fake data — see synthetic_dataset.py "
             "for something you can actually train against today."
         )
 
-    def _read_region(self, entry: PatchIndexEntry) -> Tuple[torch.Tensor, torch.Tensor]:
+    def _read_region(self, entry: PatchIndexEntry) -> tuple[torch.Tensor, torch.Tensor]:
         raise NotImplementedError(
             "Implement windowed reads against the real mosaic format "
             "(tifffile/zarr/vendor SDK) here."

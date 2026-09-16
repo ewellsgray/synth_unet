@@ -15,7 +15,6 @@ import os
 import platform
 import sys
 import time
-from typing import List, Optional
 
 import torch
 
@@ -94,7 +93,7 @@ def format_duration(seconds: float) -> str:
     return f"{secs}s"
 
 
-def gpu_memory_mb(device: torch.device) -> Optional[float]:
+def gpu_memory_mb(device: torch.device) -> float | None:
     """Peak allocated GPU memory for this device since the last reset, in MB.
     Returns None on backends without a comparable stat (e.g. CPU)."""
     if device.type == "cuda":
@@ -121,7 +120,7 @@ class MetricsRecorder:
     """Appends one CSV row per epoch to `<run_dir>/metrics.csv`, so a run's
     learning curves can be plotted/compared later without re-parsing logs."""
 
-    def __init__(self, run_dir: str, class_names: List[str]):
+    def __init__(self, run_dir: str, class_names: list[str]):
         self.class_names = class_names
         self.path = os.path.join(run_dir, "metrics.csv")
         self._fieldnames = (
@@ -139,7 +138,7 @@ class MetricsRecorder:
         lr: float,
         epoch_time_sec: float,
         dice: torch.Tensor,
-        gpu_mem_mb: Optional[float],
+        gpu_mem_mb: float | None,
     ) -> None:
         row = [epoch, train_loss, val_balanced_accuracy, lr, epoch_time_sec, gpu_mem_mb or ""]
         row += [v for v in dice.tolist()]

@@ -18,7 +18,7 @@ from PIL import Image
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from config import TrainConfig
-from data.synthetic_dataset import make_synthetic_case, colorize_mask
+from data.synthetic_dataset import colorize_mask, make_synthetic_case
 
 
 def export_samples(count: int, out_dir: str, patch_size: int, seed: int):

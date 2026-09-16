@@ -8,7 +8,7 @@ applied in the loss function / inference code, not inside the model, which is
 the standard convention for numerical stability with CrossEntropyLoss.
 """
 import torch
-import torch.nn as nn
+from torch import nn
 
 
 class DoubleConv(nn.Module):

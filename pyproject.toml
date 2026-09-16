@@ -6,6 +6,7 @@ requires-python = ">=3.10"
 
 [project.optional-dependencies]
 test = ["pytest>=8.0", "pytest-cov>=5.0"]
+dev = ["pytest>=8.0", "pytest-cov>=5.0", "ruff>=0.6", "mypy>=1.10", "pre-commit>=3.7"]
 
 [tool.setuptools]
 py-modules = ["config", "train", "inference"]
@@ -17,5 +18,25 @@ include = ["data*", "model*", "utils*", "scripts*"]
 testpaths = ["tests"]
 markers = [
     "slow: full training/e2e runs, excluded by default (run with `pytest -m slow`)",
+    "smoke: fast no-exception/finite-loss check of a few real training steps",
+    "overfit: trains on a fixed tiny batch and asserts the loss collapses (mathematical sanity, not just 'runs')",
+    "data_invariant: pure data-pipeline range/shape/dtype checks, no model involved",
 ]
-addopts = "-m 'not slow' -ra"
+addopts = "-m 'not slow and not overfit' -ra"
+
+[tool.ruff]
+target-version = "py312"
+exclude = ["checkpoints", "logs", ".venv"]
+
+[tool.ruff.lint]
+# BLE001/S110: utils/device.py and utils/logging.py deliberately catch a
+# broad Exception when probing optional hardware backends (torch.xpu) whose
+# failure mode isn't a fixed, documented exception type across torch builds
+# — narrowing this would risk breaking the CPU fallback on some installs.
+ignore = ["BLE001", "S110"]
+
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true
+exclude = "^(checkpoints|logs|\\.venv)/"
+files = ["config.py", "train.py", "inference.py", "data", "model", "utils", "scripts", "tests"]

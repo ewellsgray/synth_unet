@@ -13,11 +13,10 @@ Combines:
 This combination is a common, well-tested default for imbalanced medical
 image segmentation (rather than picking one over the other).
 """
-from typing import Optional
 
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
+from torch import nn
 
 
 def soft_dice_loss(
@@ -37,7 +36,7 @@ class WeightedCEDiceLoss(nn.Module):
     def __init__(
         self,
         num_classes: int,
-        class_weights: Optional[torch.Tensor] = None,
+        class_weights: torch.Tensor | None = None,
         dice_weight: float = 0.5,
         use_dice: bool = True,
     ):

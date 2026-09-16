@@ -6,7 +6,6 @@ interview notes): it's the average of per-class recall, which prevents the
 dominant classes (dermis, adipose, background) from masking poor performance
 on the rare-but-critical tumor classes (BCC/SCC).
 """
-from typing import Dict, List
 
 import torch
 
@@ -58,5 +57,5 @@ def per_class_dice(
     return dice
 
 
-def format_class_metrics(values: torch.Tensor, class_names: List[str]) -> str:
+def format_class_metrics(values: torch.Tensor, class_names: list[str]) -> str:
     return ", ".join(f"{name}={v:.3f}" for name, v in zip(class_names, values.tolist()))

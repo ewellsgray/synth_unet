@@ -1,0 +1,37 @@
+repos:
+  - repo: local
+    hooks:
+      - id: ruff
+        name: ruff lint
+        entry: .venv/bin/ruff check .
+        language: system
+        pass_filenames: false
+        types: [python]
+
+      - id: mypy
+        name: mypy type check
+        entry: .venv/bin/mypy
+        language: system
+        pass_filenames: false
+        types: [python]
+
+      - id: smoke-tests
+        name: smoke tests (~5s)
+        entry: .venv/bin/pytest tests/smoke -q
+        language: system
+        pass_filenames: false
+        types: [python]
+
+      - id: overfit-tests
+        name: overfit tests (~30s)
+        entry: .venv/bin/pytest tests/overfit -m overfit -q
+        language: system
+        pass_filenames: false
+        types: [python]
+
+      - id: data-invariant-tests
+        name: data invariant tests (~2s)
+        entry: .venv/bin/pytest tests/data_invariants -q
+        language: system
+        pass_filenames: false
+        types: [python]

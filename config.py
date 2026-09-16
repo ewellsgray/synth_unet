@@ -5,11 +5,10 @@ Editing this file is the primary way to change how a training run behaves —
 nothing else in the project should need to be touched for routine experiments.
 """
 from dataclasses import dataclass, field
-from typing import List, Optional
 
 # The 7 mutually-exclusive per-pixel classes the model predicts a probability
 # map for, based on the tissue/lesion categories relevant to Mohs margin mapping.
-TISSUE_CLASSES: List[str] = [
+TISSUE_CLASSES: list[str] = [
     "epidermis",
     "dermis_normal_stroma",
     "bcc_tumor_nests",
@@ -23,7 +22,7 @@ TISSUE_CLASSES: List[str] = [
 # default class weights. In real margin-mapping data, background/normal stroma
 # dominates and tumor classes (the ones you actually care about) are rare —
 # this is the class-imbalance problem "balanced accuracy" is meant to address.
-DEFAULT_CLASS_PREVALENCE: List[float] = [0.12, 0.30, 0.04, 0.03, 0.30, 0.06, 0.15]
+DEFAULT_CLASS_PREVALENCE: list[float] = [0.12, 0.30, 0.04, 0.03, 0.30, 0.06, 0.15]
 
 
 @dataclass
@@ -46,14 +45,14 @@ class TrainConfig:
     depth: int = 4                # number of down/up-sampling stages
 
     # --- Hardware / performance ---
-    device_preference: List[str] = field(default_factory=lambda: ["cuda", "xpu", "cpu"])
+    device_preference: list[str] = field(default_factory=lambda: ["cuda", "xpu", "cpu"])
     use_amp: bool = True          # mixed-precision training (FP16/BF16 autocast)
     num_workers: int = 4
 
     # --- Checkpointing ---
     checkpoint_dir: str = "checkpoints"
     checkpoint_every: int = 1     # epochs between checkpoint saves
-    resume_from: Optional[str] = None
+    resume_from: str | None = None
 
     # --- Logging ---
     log_dir: str = "logs"         # each run gets its own logs/<timestamp>/ subdirectory
@@ -65,7 +64,7 @@ class TrainConfig:
     # --- Class imbalance handling ---
     # If None, weights are auto-derived at runtime from the training set's
     # observed pixel frequency (inverse-frequency weighting) — see train.py.
-    class_weights: Optional[List[float]] = None
+    class_weights: list[float] | None = None
     use_dice_loss: bool = True    # combine weighted CE with soft Dice, common for imbalanced segmentation
 
     # --- Synthetic dataset (used until a real data pipeline is wired in) ---

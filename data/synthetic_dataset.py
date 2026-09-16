@@ -12,7 +12,6 @@ end-to-end. Swap this module out for `data/real_dataset.py` once real
 OME-TIFF/OME-Zarr mosaics and pathologist labels are available (see that
 file's docstring for the intended interface).
 """
-from typing import Tuple
 
 import numpy as np
 import torch
@@ -147,7 +146,7 @@ def colorize_mask(mask: np.ndarray) -> np.ndarray:
 
 def make_synthetic_case(
     size: int, seed: int
-) -> Tuple[np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray]:
     """Generate one (image, mask) pair. image: (H, W, 3) uint8, mask: (H, W) int64."""
     rng = np.random.default_rng(seed)
     mask = _make_mask(size, size, rng)
